@@ -17,11 +17,14 @@ public class PNGBoxPoolRenderer implements BoxPoolRenderer {
     @Override
     public void render(BoxPool pool){
         Random random = new Random();
-        Rectangle bnd = pool.getBoundary();
-        pool.offset(new Point(-bnd.x, -bnd.y));
+        Rectangle bnd = pool.getGrid();
+        pool.align();
         BufferedImage image = new BufferedImage(bnd.width, bnd.height, BufferedImage.TYPE_INT_RGB);
 		Graphics2D g = (Graphics2D) image.getGraphics();
+        g.setBackground(Color.WHITE);
         Rectangle[] recs = pool.getRectangles();
+        g.setColor(Color.BLACK);
+        g.fill(pool.getGrid());
         for (Rectangle rec : recs) {
     		int red = random.nextInt(32,128);
             int green = random.nextInt(64, 255);

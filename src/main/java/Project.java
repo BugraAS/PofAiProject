@@ -34,7 +34,16 @@
 public class Project {
 	public static void main(String[] args) {
 		BoxPool pool = new BoxPool("input.txt");
-		PNGBoxPoolRenderer renderer = new PNGBoxPoolRenderer("boxes.png");
+		pool.resolveConflict();
+		pool.align();
+		GeneticAlgorithm solver = new GeneticAlgorithm(pool, 40, 0.05);
+
+		BoxPool solution = solver.solve();
+		solution.resolveConflict();
+
+		PNGBoxPoolRenderer renderer = new PNGBoxPoolRenderer("dumb.png");
 		renderer.render(pool);
+		PNGBoxPoolRenderer renderer2 = new PNGBoxPoolRenderer("boxes.png");
+		renderer2.render(solution);
 	}
 }
