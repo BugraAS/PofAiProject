@@ -24,11 +24,11 @@ public class PNGBoxPoolRenderer implements BoxPoolRenderer {
         g.setBackground(Color.WHITE);
         Rectangle[] recs = pool.getRectangles();
         g.setColor(Color.BLACK);
-        g.fill(pool.getGrid());
+        g.fill(pool.getBoundary());
         for (Rectangle rec : recs) {
-    		int red = random.nextInt(32,128);
-            int green = random.nextInt(64, 255);
-            int blue = random.nextInt(128, 255);
+    		int red = random.nextInt(128 - 32) +32;
+            int green = random.nextInt(255-64) + 64;
+            int blue = random.nextInt(255-128)+128;
             g.setColor(new Color(red, green, blue));
             g.fill(rec);
         }

@@ -26,7 +26,7 @@ public class GeneticAlgorithm {
     static BoxPool randomizePool(BoxPool pool){
         BoxPool out = new BoxPool(pool);
         for (int i = 0; i < out.size(); i++) {
-            out.place(i, new Point(rand.nextInt(-10,10),rand.nextInt(-10,10)));
+            out.place(i, new Point(rand.nextInt(20) - 10,rand.nextInt(20) - 10));
             if(rand.nextBoolean())
                 out.rotate(i);
         }
@@ -191,7 +191,7 @@ public class GeneticAlgorithm {
     private BoxPool mutate(BoxPool pool) {
 
         for (int i = 0; i < pool.size(); i++) {
-            if (rand.nextDouble(1.0) < mutationRate) {
+            if (rand.nextDouble() < mutationRate) {
                 pool=mutatePool(i, pool); // this a problem for garbage collector to deal with
             }
         }
