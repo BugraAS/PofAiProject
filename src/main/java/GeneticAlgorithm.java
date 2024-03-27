@@ -1,7 +1,4 @@
-
-
-import java.awt.Point;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
@@ -14,6 +11,7 @@ public class GeneticAlgorithm {
     private int populationSize;
     private double mutationRate;
     private double idealFitnessThreshold = 0.9;
+    private static final int MAX_GENERATION = 5000;
 
     public GeneticAlgorithm(BoxPool pool, int populationSize, double mutationRate) {
         this.adam = pool;
@@ -70,6 +68,44 @@ public class GeneticAlgorithm {
         return out;
     }
 
+    static private BoxPool crossoverOPX(BoxPool p1, BoxPool p2) {
+        /*
+        The OPX Crossover  (One-point Crossover)
+
+        See more information
+        https://www.researchgate.net/publication/335991207_Izmir_Iktisat_Dergisi_Gezgin_Satici_Probleminin_Genetik_Algoritmalar_Kullanarak_Cozumunde_Caprazlama_Operatorlerinin_Ornek_Olaylar_Bazli_Incelenmesi_Investigation_Of_Crossover_Operators_Using_Genetic_
+        */
+
+        BoxPool child = new BoxPool(p1);
+        int c = rand.nextInt(p1.size());
+
+        if (rand.nextBoolean()) {
+            while (c < p1.size()) {
+                child.setRectangle(c, p2.getRectangle(c));
+                c++;
+            }
+        }
+
+        child.resolveConflict();
+        child.align();
+        return child;
+    }
+
+    private double calculateFillRatio(BoxPool pool) {
+        Rectangle bnd = pool.getBoundary();
+        return pool.calcTotalArea() / (double)(bnd.width*bnd.height);
+    }
+
+    private void printSolutionDetails(BoxPool pool) {
+        Rectangle[] rectangles = pool.getRectangles();
+        System.out.println("Number of Rectangles: " + pool.size());
+        for (int i = 0; i < rectangles.length; i++) {
+            Rectangle rect = rectangles[i];
+            System.out.println("Rectangle " + i + ": x=" + rect.x + ", y=" + rect.y + ", width=" + rect.width + ", height=" + rect.height);
+        }
+        // Eğer daha detaylı bilgiler yazdırmak istiyorsanız, bu metod içerisine ekleyebilirsiniz.
+    }
+
     public BoxPool solve() {
         int generation = 0;
         BoxPool bestSolution = null;
@@ -86,7 +122,8 @@ public class GeneticAlgorithm {
             for (int i = 0; i < populationSize -2; i++) {
                 BoxPool parent1 = selectParent();
                 BoxPool parent2 = selectParent();
-                BoxPool child = crossover(parent1, parent2);
+//                BoxPool child = crossover(parent1, parent2);
+                BoxPool child = crossoverOPX(parent1, parent2);
                 child = mutate(child);
                 child.resolveConflict();
                 child.align();
@@ -119,37 +156,10 @@ public class GeneticAlgorithm {
             System.err.println("No solution found.");
             return null;
         }
-        
+
         System.out.println("Best solution found:");
         printSolutionDetails(bestSolution);
         return bestSolution;
-    }
-
-    private double calculateFillRatio(BoxPool pool) {
-        Rectangle bnd = pool.getBoundary();
-        return pool.calcTotalArea() / (double)(bnd.width*bnd.height);
-    }
-
-    private void printSolutionDetails(BoxPool pool) {
-        Rectangle[] rectangles = pool.getRectangles();
-        System.out.println("Number of Rectangles: " + pool.size());
-        for (int i = 0; i < rectangles.length; i++) {
-            Rectangle rect = rectangles[i];
-            System.out.println("Rectangle " + i + ": x=" + rect.x + ", y=" + rect.y + ", width=" + rect.width + ", height=" + rect.height);
-        }
-        // Eğer daha detaylı bilgiler yazdırmak istiyorsanız, bu metod içerisine ekleyebilirsiniz.
-    }
-
-    // Termination condition remains the same
-    private boolean terminationConditionMet(int generation, BoxPool bestSolution) {
-        // Nesil sayısı kontrolü
-        if (generation >= 1000) {
-            return true;
-        }
-
-        // Fitness eşik değeri kontrolü
-        double fillRatio = calculateFillRatio(bestSolution);
-        return (fillRatio <= 1.0) && (fillRatio >= idealFitnessThreshold);
     }
 // Tournament selection strategy
 
@@ -186,6 +196,18 @@ public class GeneticAlgorithm {
         child.resolveConflict();
         child.align();
         return child;
+    }
+
+    // Termination condition remains the same
+    private boolean terminationConditionMet(int generation, BoxPool bestSolution) {
+        // Nesil sayısı kontrolü
+        if (generation >= MAX_GENERATION) {
+            return true;
+        }
+
+        // Fitness eşik değeri kontrolü
+        double fillRatio = calculateFillRatio(bestSolution);
+        return (fillRatio <= 1.0) && (fillRatio >= idealFitnessThreshold);
     }
 
     private BoxPool mutate(BoxPool pool) {
