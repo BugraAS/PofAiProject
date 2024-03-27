@@ -68,6 +68,18 @@ public class GeneticAlgorithm {
         return out;
     }
 
+    // One-point crossover
+    static private BoxPool crossover(BoxPool p1, BoxPool p2) {
+        BoxPool child = new BoxPool(p1);
+        for (int i = 0; i < p1.size(); i++) {
+            if (rand.nextBoolean())
+                p1.setRectangle(i, p2.getRectangle(i));
+        }
+        child.resolveConflict();
+        child.align();
+        return child;
+    }
+
     static private BoxPool crossoverOPX(BoxPool p1, BoxPool p2) {
         /*
         The OPX Crossover  (One-point Crossover)
@@ -103,7 +115,7 @@ public class GeneticAlgorithm {
             Rectangle rect = rectangles[i];
             System.out.println("Rectangle " + i + ": x=" + rect.x + ", y=" + rect.y + ", width=" + rect.width + ", height=" + rect.height);
         }
-        // Eğer daha detaylı bilgiler yazdırmak istiyorsanız, bu metod içerisine ekleyebilirsiniz.
+        // If you want to print more detailed information, you can add it to this method.
     }
 
     public BoxPool solve() {
@@ -118,7 +130,7 @@ public class GeneticAlgorithm {
             newPopulation.add(population.get(0));
             newPopulation.add(population.get(1));
 
-            // Yeni nesil için bireyleri seç, çaprazla ve mutasyona uğrat
+            // Select, cross and mutate individuals for the next generation
             for (int i = 0; i < populationSize -2; i++) {
                 BoxPool parent1 = selectParent();
                 BoxPool parent2 = selectParent();
@@ -131,7 +143,7 @@ public class GeneticAlgorithm {
                 newPopulation.add(child);
             }
 
-            // En iyi bireyi bul ve kaydet
+            // Select best individual
             for (BoxPool pool : newPopulation) {
                 double fitness = calcBestArea(pool);
                 if (fitness < bestFitness) {
@@ -139,7 +151,8 @@ public class GeneticAlgorithm {
                     bestSolution = pool;
                 }
             }
-            // Durum kontrolü
+
+            // Condition check
             if (terminationConditionMet(generation, bestSolution)) {
                 System.out.println("Ideal condition met, stopping the algorithm.");
                 break;
@@ -151,7 +164,7 @@ public class GeneticAlgorithm {
                 System.out.println("Generation " + generation + " Best Fitness: " + bestFitness);
         }
 
-        // Sonuçları konsola yazdır ve görselleştir
+        // Print results on the console and visualize it
         if(bestSolution == null){
             System.err.println("No solution found.");
             return null;
@@ -161,8 +174,8 @@ public class GeneticAlgorithm {
         printSolutionDetails(bestSolution);
         return bestSolution;
     }
-// Tournament selection strategy
 
+    // Tournament selection strategy
     private BoxPool selectParent() {
         Random rand = new Random();
         int tournamentSize = 5; // Or some other size you determine
@@ -186,26 +199,15 @@ public class GeneticAlgorithm {
         return  bnd.width*bnd.height - pool.calcTotalArea();
     }
 
-// One-point crossover
-    static private BoxPool crossover(BoxPool p1, BoxPool p2) {
-        BoxPool child = new BoxPool(p1);
-        for (int i = 0; i < p1.size(); i++) {
-            if(rand.nextBoolean())
-                p1.setRectangle(i, p2.getRectangle(i));
-        }
-        child.resolveConflict();
-        child.align();
-        return child;
-    }
 
     // Termination condition remains the same
     private boolean terminationConditionMet(int generation, BoxPool bestSolution) {
-        // Nesil sayısı kontrolü
+        // Generation number checking
         if (generation >= MAX_GENERATION) {
             return true;
         }
 
-        // Fitness eşik değeri kontrolü
+        // Fitness threshold checking
         double fillRatio = calculateFillRatio(bestSolution);
         return (fillRatio <= 1.0) && (fillRatio >= idealFitnessThreshold);
     }
