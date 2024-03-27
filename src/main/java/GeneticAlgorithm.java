@@ -103,6 +103,50 @@ public class GeneticAlgorithm {
         return child;
     }
 
+    static private BoxPool crossoverTPX(BoxPool p1, BoxPool p2) {
+        /*
+        The TPX Crossover for G1DList (two-point crossover)
+
+        See more information in the
+        <https://scholar.google.com/scholar?output=instlink&q=info:7d_ZB2LqT3QJ:scholar.google.com/&hl=tr&as_sdt=0,5&scillfp=480710777611443790&oi=lle>
+        <https://scholar.archive.org/work/yxts2ace4rcxfjugvhdjby2o3a/access/wayback/https://www.isr-publications.com/jmcs/691/download-ccgdc-a-new-crossover-operator-for-genetic-data-clustering>
+         */
+
+        BoxPool child = new BoxPool(p1);
+        int c1 = rand.nextInt(p1.size());
+        int c2 = rand.nextInt(p1.size());
+
+        while (c1 == c2) {
+            c2 = rand.nextInt(p1.size());
+        }
+
+        if (c1 > c2) {
+            int temp = c1;
+            c1 = c2;
+            c2 = temp;
+        }
+
+        BoxPool p = new BoxPool();
+        if (rand.nextBoolean()) {
+            for (int i = c1; i < c2; i++) {
+                p.addRectangle(p1.getRectangle(i));
+            }
+            for (int i = 0; i < p2.size(); i++) {
+                if (i <= c1) {
+                    child.setRectangle(i, p2.getRectangle(i));
+                } else if (i < c2) {
+                    child.setRectangle(i, p.getRectangle(i - c1));
+                } else {
+                    child.setRectangle(i, p2.getRectangle(i));
+                }
+            }
+        }
+
+        child.resolveConflict();
+        child.align();
+        return child;
+    }
+
     private double calculateFillRatio(BoxPool pool) {
         Rectangle bnd = pool.getBoundary();
         return pool.calcTotalArea() / (double)(bnd.width*bnd.height);
@@ -135,7 +179,8 @@ public class GeneticAlgorithm {
                 BoxPool parent1 = selectParent();
                 BoxPool parent2 = selectParent();
 //                BoxPool child = crossover(parent1, parent2);
-                BoxPool child = crossoverOPX(parent1, parent2);
+//                BoxPool child = crossoverOPX(parent1, parent2);
+                BoxPool child = crossoverTPX(parent1, parent2);
                 child = mutate(child);
                 child.resolveConflict();
                 child.align();

@@ -1,5 +1,4 @@
-import java.awt.Point;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -17,7 +16,7 @@ public class BoxPool {
     private ArrayList<Integer> yoff;
     private int nitems;
 
-    private BoxPool() {
+    public BoxPool() {
         widths = new ArrayList<Integer>();
         xoff = new ArrayList<Integer>();
         heights = new ArrayList<Integer>();
