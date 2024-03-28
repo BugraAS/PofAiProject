@@ -126,16 +126,17 @@ public class GeneticAlgorithm {
             c2 = temp;
         }
 
-        BoxPool p = new BoxPool();
+        // TODO check it
+//        BoxPool p = new BoxPool();
         if (rand.nextBoolean()) {
-            for (int i = c1; i < c2; i++) {
-                p.addRectangle(p1.getRectangle(i));
-            }
+//            for (int i = c1; i < c2; i++) {
+//                p.addRectangle(p1.getRectangle(i));
+//            }
             for (int i = 0; i < p2.size(); i++) {
                 if (i <= c1) {
                     child.setRectangle(i, p2.getRectangle(i));
                 } else if (i < c2) {
-                    child.setRectangle(i, p.getRectangle(i - c1));
+                    child.setRectangle(i, p1.getRectangle(i));
                 } else {
                     child.setRectangle(i, p2.getRectangle(i));
                 }
